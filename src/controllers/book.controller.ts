@@ -54,33 +54,27 @@ export class BookController {
         const bookqueryBuilder = BookController.bookrepository.createQueryBuilder('books')
         const sortBy = req.query.sort_by
 
+      
+        bookqueryBuilder.leftJoinAndSelect('books.categories','categories')
+    
         if(req.query.genre){
-        bookqueryBuilder.leftJoinAndSelect('books.categories','categories').where("categories.slug = :categoryslug",{categoryslug:req.query.genre})
+        bookqueryBuilder.andWhere("categories.slug = :categoryslug",{categoryslug:req.query.genre})
         }
    
         if(req.query.sub_genre){
-        bookqueryBuilder.leftJoinAndSelect('books.categories','subcategories').where("subcategories.slug = :subcategoryslug",{subcategoryslug:req.query.sub_genre})
+        bookqueryBuilder.andWhere("categories.slug = :subcategoryslug",{subcategoryslug:req.query.sub_genre})
         }
 
-
+        if(req.query.search){
+            bookqueryBuilder.andWhere('title ILIKE :searchQuery OR description ILIKE :searchQuery',{searchQuery:`%${req.query.search}%`})
+        }
         if(sortBy){
             if(sortBy==="new_arrival")  bookqueryBuilder.orderBy("books.created_at","DESC")
-            if(sortBy==="bestsellers")  bookqueryBuilder.andWhere("books.isbestSeller = true")
+            if(sortBy==="bestsellers")  bookqueryBuilder.andWhere("books.isbestSeller = :isbestseller",{isbestseller:true})
             if(sortBy==="with_discount") bookqueryBuilder.andWhere("books.with_discount = true")
             if(sortBy==="out_of_stock")  bookqueryBuilder.andWhere("books.stock = 0")
         }
        
-        //paginate book results 
-        let {page,limit} = req.query
-
-        const current_page=parseInt(page as string) 
-        const per_page = parseInt(limit as string)
-        const skip = (current_page-1)*per_page
-
-        if(current_page>0 && !isNaN(current_page) && per_page>0 && isNaN(per_page)){
-         bookqueryBuilder.offset(skip).limit(per_page)
-        }
-
         //selecting price 
         const price_range = req.query.price as string;
 
@@ -93,21 +87,31 @@ export class BookController {
                 const minimum = parseInt(price_range.replace("+",""))
                 bookqueryBuilder.andWhere("books.price>=:minimum",{minimum})
             }
-
-
         }
 
 
+          //paginate book results 
+          let {page,limit} = req.query
 
-        // const pagination = {
-        //     total:count,
-        //     count:count,
-        //     current_page:page,
-        //     per_page:size,
-        //     total_pages: Math.ceil(count/size)
+          const current_page=parseInt(page as string) || 1
+          const per_page = parseInt(limit as string) || 20
+          const skip = (current_page-1)*per_page
+  
+          if(current_page>0 && !isNaN(current_page) && per_page>0 && isNaN(per_page)){
+           bookqueryBuilder.offset(skip).limit(per_page)
+          }
 
-        // }
+          const [books,count] = await bookqueryBuilder.getManyAndCount()
 
-        // return res.status(StatusCodes.OK).json({message:"Success",data:books,pagination})
+        const pagination = {
+            total:count,
+            count:count,
+            current_page,
+            per_page,
+            total_pages: Math.ceil(count/per_page)
+
+        }
+
+        return res.status(StatusCodes.OK).json({message:"Success",data:books,pagination})
     }
 }

@@ -1,4 +1,4 @@
-import { Entity,Column, ManyToOne, ManyToMany, JoinTable } from "typeorm";
+import { Entity,Column, ManyToOne, ManyToMany, JoinTable, Index } from "typeorm";
 import { Base } from "./base.entity";
 import { Categories } from "./categories.entity";
 

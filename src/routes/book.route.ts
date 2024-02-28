@@ -7,5 +7,6 @@ import { ErrorWrapper } from '../hoc/ErrorWrapper';
 const router = express.Router()
 
 router.post('/',validateData(bookcreateSchema),ErrorWrapper(BookController.createBook))
+router.get('/',ErrorWrapper(BookController.getBooks))
 
 export {router as bookRouter}
