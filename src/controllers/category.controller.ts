@@ -38,6 +38,7 @@ export class CategoryController {
     const [allcategorites,count] = await CategoryController.categoryrepository
     .createQueryBuilder('category')
     .leftJoinAndSelect('category.children','children')
+    .where('category.parent IS NULL')
     .getManyAndCount();
 
     return res.status(StatusCodes.OK).json({message:'Success',data:allcategorites,totalCategories:count})
