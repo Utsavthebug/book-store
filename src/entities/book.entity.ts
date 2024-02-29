@@ -1,6 +1,7 @@
-import { Entity,Column, ManyToOne, ManyToMany, JoinTable, Index } from "typeorm";
+import { Entity,Column, ManyToOne, ManyToMany, JoinTable, Index, OneToMany } from "typeorm";
 import { Base } from "./base.entity";
 import { Categories } from "./categories.entity";
+import { Cartproduct } from "./cartproduct.entity";
 
 @Entity({name:'books'})
 export class Book extends Base{
@@ -37,4 +38,7 @@ export class Book extends Base{
     @ManyToMany(()=>Categories,(category)=>category.books,{onDelete:'CASCADE'})
     @JoinTable()
     categories:Categories[]
+
+    @OneToMany(()=>Cartproduct,cartproduct=>cartproduct.book)
+    public cartproducts:Cartproduct[]
 }

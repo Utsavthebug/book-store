@@ -1,6 +1,7 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import { Base } from "./base.entity";
 import { UserRole } from "../types/user.type";
+import { Cart } from "./cart.entity";
 
 @Entity({name:'users'})
 export class User extends Base{
@@ -36,5 +37,8 @@ export class User extends Base{
         default:false
     })
     isActive:boolean
+
+    @OneToMany(()=>Cart,(cart)=>cart.user)
+    carts:Cart[]
     
     }
