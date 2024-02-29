@@ -18,7 +18,7 @@ export class Categories extends Base {
     @OneToMany((type)=>Categories,(category)=>category.parent)
     children:Categories[]
 
-    @ManyToMany(()=>Book,(book)=>book.categories)
+    @ManyToMany(()=>Book,(book)=>book.categories,{onDelete:'CASCADE'})
     books:Book[]
 
     @BeforeInsert()

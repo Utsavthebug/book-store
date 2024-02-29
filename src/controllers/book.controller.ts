@@ -114,4 +114,47 @@ export class BookController {
 
         return res.status(StatusCodes.OK).json({message:"Success",data:books,pagination})
     }
+
+    public static async deleteBook(req:Request,res:Response){
+        const {bookId} = req.params
+        await BookController.bookrepository.delete(bookId)
+        res.status(StatusCodes.OK).json({message:"succesfully deleted"})
+    }
+
+
+    public static async updateBook(req:Request,res:Response){
+        const {bookId} = req.params
+        const updateFields = req.body
+        
+        const book = await BookController.bookrepository.findOne({
+            where:{
+                id:bookId
+            }
+        })
+
+        if(!book){
+            return res.status(StatusCodes.NOT_FOUND).json({message:"Book not found"})
+        }
+
+        Object.assign(book,updateFields)
+
+        await BookController.bookrepository.save(book)
+
+        return res.status(StatusCodes.OK).json({message:"Succesfully updated",data:book})
+    }
+
+    public static async getBook(req:Request,res:Response){
+        const {bookId} = req.params
+        //fetching book from db 
+        const book = await BookController.bookrepository.createQueryBuilder("book")
+        .where("book.id = :id",{id:bookId})
+        .leftJoinAndSelect("book.categories",'categories').getOne()
+        
+        if(!book){
+            return res.status(StatusCodes.NOT_FOUND).json({message:"Book not found"})
+        }
+
+        return res.status(StatusCodes.OK).json({message:'success',data:book})
+    }
+
 }

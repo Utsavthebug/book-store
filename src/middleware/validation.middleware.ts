@@ -2,7 +2,7 @@ import { Request,Response,NextFunction } from "express";
 import {z,ZodError} from 'zod'
 import { StatusCodes } from "http-status-codes";
 
-export function validateData(schema:z.AnyZodObject){
+export function validateData(schema:z.AnyZodObject | z.ZodOptional<z.AnyZodObject>){
     return (req:Request,res:Response,next:NextFunction)=>{
         try {
             schema.parse(req.body)

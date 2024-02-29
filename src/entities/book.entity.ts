@@ -34,7 +34,7 @@ export class Book extends Base{
     @Column({default:0})
     stock:number;
 
-    @ManyToMany(()=>Categories,(category)=>category.books)
+    @ManyToMany(()=>Categories,(category)=>category.books,{onDelete:'CASCADE'})
     @JoinTable()
     categories:Categories[]
 }
