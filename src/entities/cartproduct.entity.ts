@@ -20,7 +20,4 @@ export class Cartproduct extends Base {
     @ManyToOne(()=>Book,(book)=>book.cartproducts)
     public book:Book
 
-    // @ManyToOne(()=>Book,(book)=>book.cart)
-    // @JoinColumn({name:'bookId'})
-    //  book:Book
 }
