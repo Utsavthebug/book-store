@@ -8,20 +8,63 @@ export class CartController {
     private static readonly cartrepository = AppDataSource.getRepository(Cart)
     private static readonly cartproductrepository = AppDataSource.getRepository(Cartproduct)
 
+    public static async updateCartItem(req:Request,res:Response){
+        const {cartproductId} = req.params
+        const {amount} = req.body
+
+        const cartProduct =  await CartController.cartproductrepository.findOne({
+            where:{
+             id:cartproductId   
+            }
+        })
+
+        if(!cartProduct){
+           return res.status(StatusCodes.NOT_FOUND).json({message:'Cart Product not found!'})
+        }
+
+        if(amount>0) cartProduct.amount = amount;
+
+        const newcartProduct = await CartController.cartproductrepository.save(cartProduct)
+
+        return res.status(StatusCodes.OK).json({data:newcartProduct,message:"Cart Updated Succesfully"})
+    }
+
+    public static async deleteCartItem(req:Request,res:Response){
+        const {cartproductId} = req.params
+
+        //delete using querybuilder 
+        await CartController.cartproductrepository.createQueryBuilder('cartproduct')
+        .delete()
+        .where("id = :id",{id:cartproductId})
+        .execute()
+
+        res.status(StatusCodes.OK).json({message:"Deleted Succesfully"})
+    }
+
     public static async getCartItems(req:Request,res:Response){
         const userId = req['currentUser'].id
 
-        const cartItems = await CartController.cartrepository.findOne({
-            relations:{
-                cartproducts:true
-            },
+        //getting cartId from user id 
+        const cart = await CartController.cartrepository.findOne({
             where:{
                 user:{
                     id:userId
                 }
             }
         })
-     return res.status(StatusCodes.OK).json({message:'Sucess',data:cartItems})
+
+
+        if(!cart){
+            return res.status(StatusCodes.NOT_FOUND).json({message:'Cart Not Found'})
+        }
+
+        const cartProductList = await CartController.cartproductrepository.createQueryBuilder('cart_product')
+        .where("cart_product.cartId = :cartId",{cartId:cart.id})
+        .leftJoinAndSelect("cart_product.book","book")
+        .select(["cart_product.id","book","cart_product.amount"])
+        .getMany()
+
+     return res.status(StatusCodes.OK).json({message:'Sucess',data:cartProductList})
     }
 
     public static async createCart(req:Request,res:Response){
