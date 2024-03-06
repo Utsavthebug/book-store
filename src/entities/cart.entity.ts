@@ -9,7 +9,9 @@ export class Cart extends Base {
     @ManyToOne(()=>User,(user)=>user.carts)
     user:User
 
-    @OneToMany(()=>Cartproduct,cartproduct=>cartproduct.cart)
+    @OneToMany(()=>Cartproduct,cartproduct=>cartproduct.cart,{
+        onDelete:'CASCADE'
+    })
     public cartproducts:Cartproduct
 
 }

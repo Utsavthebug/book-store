@@ -2,6 +2,7 @@ import { Entity,Column, ManyToOne, ManyToMany, JoinTable, Index, OneToMany } fro
 import { Base } from "./base.entity";
 import { Categories } from "./categories.entity";
 import { Cartproduct } from "./cartproduct.entity";
+import { Orderproduct } from "./orderproduct.entity";
 
 @Entity({name:'books'})
 export class Book extends Base{
@@ -41,4 +42,8 @@ export class Book extends Base{
 
     @OneToMany(()=>Cartproduct,cartproduct=>cartproduct.book)
     public cartproducts:Cartproduct[]
+
+    @OneToMany(()=>Orderproduct,(orderproduct)=>orderproduct.book)
+    public orderproducts:Orderproduct[]
+
 }
