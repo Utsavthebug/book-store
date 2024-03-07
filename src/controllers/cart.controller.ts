@@ -45,7 +45,12 @@ export class CartController {
         const userId = req['currentUser'].id
 
         //getting cartId from user id 
-        const cart = await CartController.cartrepository.findOne({
+        const cartProductList = await CartController.cartrepository.findOne({
+            relations:{
+                cartproducts:{
+                    book:true
+                }
+            },
             where:{
                 user:{
                     id:userId
@@ -54,15 +59,15 @@ export class CartController {
         })
 
 
-        if(!cart){
+        if(!cartProductList){
             return res.status(StatusCodes.NOT_FOUND).json({message:'Cart Not Found'})
         }
 
-        const cartProductList = await CartController.cartproductrepository.createQueryBuilder('cart_product')
-        .where("cart_product.cartId = :cartId",{cartId:cart.id})
-        .leftJoinAndSelect("cart_product.book","book")
-        .select(["cart_product.id","book","cart_product.amount"])
-        .getMany()
+        // const cartProductList = await CartController.cartproductrepository.createQueryBuilder('cart_product')
+        // .where("cart_product.cartId = :cartId",{cartId:cart.id})
+        // .leftJoinAndSelect("cart_product.book","book")
+        // .select(["cart_product.id","book","cart_product.amount"])
+        // .getMany()
 
      return res.status(StatusCodes.OK).json({message:'Sucess',data:cartProductList})
     }

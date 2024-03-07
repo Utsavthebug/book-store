@@ -40,19 +40,17 @@ export class Order extends Base {
  })
  discount:number;
 
- @Column({
-    default:0
- })
+ @Column({type: "decimal", precision: 10, scale: 2, default: 0})
  tax_amount:number;
 
- @Column({nullable:false})
+@Column({type: "decimal", precision: 10, scale: 2, default: 0})
  totalAmount:number
 
 @ManyToOne(()=>User,(user)=>user.orders)
 user:User
 
-@OneToOne(()=>ShippingAddress,(address)=>address.order)
-shippingadress:ShippingAddress
+@Column(()=>ShippingAddress)
+shipping:ShippingAddress
 
 @OneToMany(()=>Orderproduct,(orderproduct)=>orderproduct.order)
 orderproducts:Orderproduct[]

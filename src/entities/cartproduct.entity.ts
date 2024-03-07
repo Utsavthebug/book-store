@@ -14,10 +14,14 @@ export class Cartproduct extends Base {
     @Column({nullable:false,default:1})
     public amount:number
 
-    @ManyToOne(()=>Cart,(cart)=>cart.cartproducts)
+    @ManyToOne(()=>Cart,(cart)=>cart.cartproducts,{
+        onDelete:'CASCADE'
+    })
     public cart:Cart
 
-    @ManyToOne(()=>Book,(book)=>book.cartproducts)
+    @ManyToOne(()=>Book,(book)=>book.cartproducts,{
+        onDelete:'CASCADE'
+    })
     public book:Book
 
 }
