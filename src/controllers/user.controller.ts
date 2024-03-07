@@ -49,8 +49,25 @@ export class UserController {
         return res.status(StatusCodes.CREATED).json({message:'User Update Succesfully',data:newUser})
     }
 
+    public static async getMe(req:Request,res:Response){
+        const userId = req['currentUser'].id
+
+        const user = await UserController.userRepository.findOne({
+            where:{
+                id:userId
+            }
+        }) 
+        if(!user){
+            return res.status(StatusCodes.NOT_FOUND).json({message:"User Not found"})
+        }
+
+        return res.status(StatusCodes.OK).json({data:user,message:'success'})
+    }
+
+
     public static async getUser(req:Request,res:Response){
-        const {userId} = req.params
+        let  {userId} = req.params
+        
         //getting user from user Id
         const user = await UserController.userRepository.findOne({
             where:{
