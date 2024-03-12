@@ -29,6 +29,11 @@ export class Order extends Base {
  orderStatus:OrderStatus;
 
  @Column({
+   default:false
+})
+isPaid:boolean
+
+ @Column({
     type:'enum',
     enum:paymentMethod,
     default:paymentMethod.COD

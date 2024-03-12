@@ -125,4 +125,43 @@ export class OrderController {
 
         return res.status(StatusCodes.OK).json({message:'Order updated',data:updatedOrder})
     }
+
+    public static async getmyOrders(req:Request,res:Response){
+        const userId = req['currentUser'].id
+
+        let {page,limit,sort,orderStatus} = req.query
+
+      
+        const userOrderquery = OrderController.orderproductrepository.createQueryBuilder('orderproducts')
+        .innerJoinAndSelect('orderproducts.order','order')
+        .innerJoin('order.user','user',"user.id = :userId",{userId})
+        .innerJoinAndSelect('orderproducts.book','book')
+
+        if(!sort){
+            userOrderquery.orderBy('orderproducts.updated_at',"DESC")
+        }
+
+        if(orderStatus){
+            userOrderquery.where('order.orderStatus = :orderStatus',{orderStatus})
+        }
+
+        if(limit){
+        const parsedPage = parseInt(page as string) || 1
+        const parsedLimit = parseInt(limit as string)
+        const take = parsedLimit
+        const skip = (parsedPage-1) * parsedLimit        
+        userOrderquery.take(take).skip(skip)
+        }
+
+        const [userOrders,total] = await userOrderquery.getManyAndCount()
+
+        const pagination = {
+            total,
+            page,
+            limit
+        }
+
+        return res.status(StatusCodes.OK).json({data:userOrders,pagination})
+
+    }
 }
