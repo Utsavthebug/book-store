@@ -6,6 +6,7 @@ import { authentication } from '../middleware/auth.middleware'
 const router = express.Router()
 
 router.post('/',authentication,ErrorWrapper(OrderController.createOrder))
+router.get('/',ErrorWrapper(OrderController.getAllOrders))
 router.patch('/:orderId',ErrorWrapper(OrderController.updateOrder))
 router.get('/me',authentication,ErrorWrapper(OrderController.getmyOrders))
 

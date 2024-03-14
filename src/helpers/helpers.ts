@@ -23,3 +23,17 @@ export class encrypt{
         return token;
     }
 }
+
+export class dateutils {
+   static getStartOfMonthUTC(day=1) {
+        var now = new Date();
+        var startOfMonthUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), day, 0, 0, 0, 0));
+        return startOfMonthUTC;
+    }
+
+    static getCurrentDateUTC() {
+        var now = new Date();
+        var currentDateUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),0,0,0,0));
+        return currentDateUTC;
+    }
+}

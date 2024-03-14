@@ -7,6 +7,7 @@ import { User } from "../entities/user.entity";
 import { Orderproduct } from "../entities/orderproduct.entity";
 import { Cart } from "../entities/cart.entity";
 import { ShippingAddress } from "../entities/shipping.entity";
+import { dateutils } from "../helpers/helpers";
 
 export class OrderController {
     private static readonly orderrepository = AppDataSource.getRepository(Order)
@@ -124,6 +125,50 @@ export class OrderController {
         const updatedOrder = await OrderController.orderrepository.save(order)
 
         return res.status(StatusCodes.OK).json({message:'Order updated',data:updatedOrder})
+    }
+
+    public static async getAllOrders(req:Request,res:Response){
+        //getting all orders 
+        const {page,limit,sort,orderStatus,startDate,endDate} = req.body
+          
+        const allOrdersquery = OrderController.orderproductrepository.createQueryBuilder('orderproducts')
+        .innerJoinAndSelect('orderproducts.order','order')
+        .innerJoinAndSelect('orderproducts.book','book')
+
+        if(limit){
+            const parsedPage = parseInt(page as string) || 1
+            const parsedLimit = parseInt(limit as string)
+            const take = parsedLimit
+            const skip = (parsedPage-1) * parsedLimit        
+            allOrdersquery.take(take).skip(skip)
+            }
+
+            
+            if(orderStatus){
+                allOrdersquery.where('order.orderStatus = :orderStatus',{orderStatus})
+            }
+
+
+            if(startDate && endDate){
+             allOrdersquery.andWhere(" DATE(orderproducts.created_at) >= :startDate ",{startDate})
+             .andWhere(" DATE(orderproducts.created_at) <= :endDate",{endDate})
+            }
+
+            if(!sort){
+                allOrdersquery.orderBy('orderproducts.updated_at',"DESC")
+            }
+
+
+            const [allOrders,total] = await allOrdersquery.getManyAndCount()
+
+            const pagination = {
+                total,
+                page,
+                limit
+            }
+    
+            return res.status(StatusCodes.OK).json({data:allOrders,pagination})
+
     }
 
     public static async getmyOrders(req:Request,res:Response){
