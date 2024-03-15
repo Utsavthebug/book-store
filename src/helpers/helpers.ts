@@ -2,6 +2,8 @@ import * as jwt from 'jsonwebtoken'
 import * as bcrypt from 'bcrypt'
 import * as dotenv from 'dotenv'
 import * as crypto from 'crypto';
+import { Between, FindOperator } from 'typeorm';
+import { format } from 'date-fns';
 
 dotenv.config()
 
@@ -35,5 +37,17 @@ export class dateutils {
         var now = new Date();
         var currentDateUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),0,0,0,0));
         return currentDateUTC;
+    }
+
+    static BetweenDates(from:Date|string,to:Date|string){
+        const fromDate = typeof from === 'string' ? new Date(from) : from;
+        const toDate = typeof to === 'string' ? new Date(to) : to;
+    
+        // Format dates as YYYY-MM-DD HH:MM:SS
+        const formattedFromDate = format(fromDate, 'yyyy-MM-dd HH:mm:ss');
+        const formattedToDate = format(toDate, 'yyyy-MM-dd HH:mm:ss');
+    
+        // Assuming Between() is your ORM's method for specifying a date range
+        return Between(formattedFromDate, formattedToDate) as unknown as FindOperator<Date>;
     }
 }

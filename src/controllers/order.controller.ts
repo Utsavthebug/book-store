@@ -7,7 +7,6 @@ import { User } from "../entities/user.entity";
 import { Orderproduct } from "../entities/orderproduct.entity";
 import { Cart } from "../entities/cart.entity";
 import { ShippingAddress } from "../entities/shipping.entity";
-import { dateutils } from "../helpers/helpers";
 
 export class OrderController {
     private static readonly orderrepository = AppDataSource.getRepository(Order)
@@ -155,7 +154,7 @@ export class OrderController {
             }
 
             if(!sort){
-                allOrdersquery.orderBy('orderproducts.updated_at',"DESC")
+                allOrdersquery.orderBy('orderproducts.created_at',"DESC")
             }
 
 
